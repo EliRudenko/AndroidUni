@@ -1,49 +1,50 @@
 package com.example.myapplication;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import es.dmoral.toasty.Toasty; // <-- этот импорт должен работать после синхронизации
 
 public class MainActivity extends AppCompatActivity {
 
-    private int clickCount = 0;
+    private int sectionIndex = 0;
+    private String[] songSections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        songSections = getResources().getStringArray(R.array.song_sections);
     }
 
     public void f(View view) {
         if (view instanceof Button) {
-            Button b = (Button) view;
+            Button button = (Button) view;
+            button.setText(R.string.next_section_button);
 
-            clickCount++;
-            b.setText(String.valueOf(clickCount));
+            if (songSections.length == 0) {
+                return;
+            }
 
-            // Генерация случайного цвета для кнопки
-            int red = (int) (Math.random() * 256);
-            int green = (int) (Math.random() * 256);
-            int blue = (int) (Math.random() * 256);
-            int randomColor = Color.rgb(red, green, blue);
-            b.setBackground(new ColorDrawable(randomColor));
+            String section = songSections[sectionIndex];
+            sectionIndex = (sectionIndex + 1) % songSections.length;
 
-            // Кастомный тост через Toasty
+            int toastBackground = ContextCompat.getColor(this, R.color.toast_background);
+            int toastText = ContextCompat.getColor(this, R.color.toast_text);
+
             Toasty.custom(
                     this,
-                    "Clicked " + clickCount + " times!",
-                    null,          // Drawable иконка (null = без иконки)
-                    randomColor,   // цвет фона
-                    Color.WHITE,   // цвет текста
-                    Toasty.LENGTH_SHORT,
-                    false,         // show icon
-                    true           // with border
+                    section,
+                    null,
+                    toastBackground,
+                    toastText,
+                    Toasty.LENGTH_LONG,
+                    false,
+                    true
             ).show();
         }
     }
